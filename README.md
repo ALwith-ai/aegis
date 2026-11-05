@@ -28,9 +28,12 @@ aegis --lang en
 aegis --lang id
 aegis --local
 aegis --update
+aegis --no-auto-update
 ```
 
 If `aegis` is not on your Mac PATH, use the full path printed by the installer. The installer does not change your shell files.
+
+Aegis checks for updates at startup, verifies the release checksum and restarts into the new version. Network failures do not block the current version. Use `--no-auto-update` to skip, or set `autoUpdate: false` in configuration.
 
 ## Privacy and scope
 
