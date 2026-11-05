@@ -1,13 +1,12 @@
-Aegis 0.1.3
+Aegis 0.2.2
 
-- Run `aegis`, enter the access password, and scanning, sanitized DeepSeek analysis and local reporting proceed automatically. No action menus or repeated confirmations.
-- Automatic startup updates, with download progress.
-- Installer shows a download progress bar and configures the command path. Installation never launches a scan.
-- Removed the ASCII shield; retained gradient AEGIS lettering.
+- DeepSeek now investigates the computer itself. The investigation prompt runs as a one-shot task on DeepSeek Harness (dsh headless): the model executes read-only commands inside a local sandbox, cites the exact commands and output, and writes the report. A full run on a developer Mac took about 15 minutes and 19 model steps; expect several minutes at least. The previous single-request summary is gone.
+- The installer now also installs the dsh runtime (about 90 MB download, verified by SHA-256) into ~/.aegis/dsh, so the first scan does not download anything.
+- The prompt is an editable file: `aegis prompt` opens it, `aegis prompt --show` prints it, `aegis prompt --reset` restores the built-in text. Plain `aegis` runs the scan with whatever is saved.
+- The HTML report the model returns (bare or inside a code block, since the sandbox refuses its own file write) is extracted, stripped of scripts and external references, and saved beside the local report as a separate file. 0.2.1 only recognised bare HTML.
+- DeepSeek receives raw command output in this mode; see the README. `--local` still skips DeepSeek entirely.
 - macOS 15+ Apple Silicon / Intel and Windows x64. Chinese, English and Indonesian.
 
-Raw evidence stays local. Use `--local` to skip DeepSeek. Source remains private; this repository distributes binaries and installers only.
-
-Validation: type checking and 21 tests passed. macOS ARM64 and Intel executable startup checked locally. The previous 0.1.2 build passed macOS 15 ARM64, macOS 15 Intel and Windows x64 CI; these 0.1.3 binaries are cross-compiled locally.
+Existing installations: run the install command again once to add the runtime; the binary alone will download it on first scan.
 
 macOS binaries are ad-hoc signed, not Apple-notarized; Windows binaries are unsigned. SHA256SUMS contains release hashes.

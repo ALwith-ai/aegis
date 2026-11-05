@@ -17,6 +17,23 @@ curl --proto '=https' --tlsv1.2 -fsSL "$base/SHA256SUMS" -o "$stage/SHA256SUMS"
 expected=$(awk -v name="$asset" '$2 == name {print $1}' "$stage/SHA256SUMS")
 actual=$(shasum -a 256 "$stage/$asset" | awk '{print $1}')
 [ -n "$expected" ] && [ "$actual" = "$expected" ] || { echo 'Checksum mismatch' >&2; exit 1; }
+# DeepSeek Harness runtime (the investigation engine), same checks: pinned release tag, SHA256SUMS, then extract.
+runtime_version=0.2.1rc2
+runtime_dir="$HOME/.aegis/dsh/$runtime_version"
+if [ ! -f "$runtime_dir/.complete" ]; then
+  runtime_asset="dsh-runtime-$runtime_version-darwin-$arch.tar.gz"
+  runtime_base="https://github.com/$repo/releases/download/dsh-runtime-$runtime_version"
+  curl --proto '=https' --tlsv1.2 -fSL --progress-bar "$runtime_base/$runtime_asset" -o "$stage/$runtime_asset"
+  curl --proto '=https' --tlsv1.2 -fsSL "$runtime_base/SHA256SUMS" -o "$stage/RUNTIME_SHA256SUMS"
+  expected=$(awk -v name="$runtime_asset" '$2 == name {print $1}' "$stage/RUNTIME_SHA256SUMS")
+  actual=$(shasum -a 256 "$stage/$runtime_asset" | awk '{print $1}')
+  [ -n "$expected" ] && [ "$actual" = "$expected" ] || { echo 'Runtime checksum mismatch' >&2; exit 1; }
+  mkdir -p "$runtime_dir" && chmod 700 "$HOME/.aegis" "$HOME/.aegis/dsh" "$runtime_dir"
+  rm -rf "$runtime_dir"/deepseek-harness-sdk-runtime-*
+  tar -xzf "$stage/$runtime_asset" -C "$runtime_dir"
+  chmod 755 "$runtime_dir"/deepseek-harness-sdk-runtime-*
+  printf '%s' "$runtime_version" > "$runtime_dir/.complete"
+fi
 install_dir="${AEGIS_INSTALL_DIR:-}"
 if [ -z "$install_dir" ]; then
   for candidate in "$HOME/.local/bin" "$HOME/.bun/bin" /opt/homebrew/bin /usr/local/bin; do
