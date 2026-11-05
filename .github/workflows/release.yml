@@ -1,0 +1,87 @@
+# Builds Aegis from the private source repository on this repository's free runners and publishes the release here.
+# Secrets: SOURCE_TOKEN (fine-grained PAT, Contents: read on ALwith-ai/aegis-private), DEEPSEEK_API_KEY (embedded key).
+name: Aegis Release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Source tag in ALwith-ai/aegis-private (for example v0.2.4)
+        required: true
+permissions:
+  contents: read
+concurrency: release-${{ inputs.tag }}
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: bun-darwin-arm64
+            executable: aegis-darwin-arm64
+          - os: macos-15-intel
+            target: bun-darwin-x64
+            executable: aegis-darwin-x64
+          - os: windows-latest
+            target: bun-windows-x64-baseline
+            executable: aegis-windows-x64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out private source at the tag
+        uses: actions/checkout@v7
+        with:
+          repository: ALwith-ai/aegis-private
+          ref: ${{ inputs.tag }}
+          token: ${{ secrets.SOURCE_TOKEN }}
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun test
+      - name: Build binary
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: bun scripts/build.ts ${{ matrix.target }}
+      - name: Sign macOS binary locally
+        if: runner.os == 'macOS'
+        run: codesign --sign - --force dist/${{ matrix.executable }}
+      - name: Binary smoke test
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          ./dist/${{ matrix.executable }} --help
+          test "$(./dist/${{ matrix.executable }} --version)" = "${TAG#v}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.executable }}
+          path: dist/${{ matrix.executable }}
+          retention-days: 7
+      - name: Release notes
+        if: matrix.target == 'bun-darwin-arm64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-notes
+          path: public/RELEASE.md
+          retention-days: 7
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist && sha256sum aegis-* > SHA256SUMS
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release create "$TAG" dist/aegis-darwin-arm64 dist/aegis-darwin-x64 dist/aegis-windows-x64.exe dist/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --title "Aegis $TAG" --notes-file dist/RELEASE.md --latest
