@@ -1,5 +1,6 @@
-Aegis 0.2.4
+Aegis 0.2.5
 
+- Fix: the startup self-update silently failed whenever the download took longer than 20 seconds (the checksum request timed out while waiting behind it). Versions before 0.2.5 cannot update themselves: run the install command once more to get this version; from 0.2.5 on, updates apply automatically and a failed update now shows its reason.
 - `aegis` calls DeepSeek Harness directly after the password: the prompt goes to dsh headless at once. The local rule scanner is gone.
 - Language and prompt editing are menus: the language menu is preselected from the operating system and remembered; the main menu offers the investigation, editing the prompt, restoring the default prompt, or exit. The `--lang` flag and the `prompt` subcommand are removed.
 - DeepSeek investigates the computer itself. The investigation prompt runs as a one-shot task on DeepSeek Harness (dsh headless): the model executes read-only commands inside a local sandbox, cites the exact commands and output, and writes the report. A full run on a developer Mac took about 15 minutes and 19 model steps; expect several minutes at least. The previous single-request summary is gone.

@@ -30,7 +30,7 @@ aegis --no-auto-update
 
 The installer configures the command automatically. If the installer asks you to reopen your terminal, do so once, then run `aegis`.
 
-Aegis checks for updates at startup, verifies the release checksum and restarts into the new version. Network failures do not block the current version. Use `--no-auto-update` to skip, or set `autoUpdate: false` in configuration.
+Versions before 0.2.5 cannot update themselves (their updater timed out on slow downloads): run the install command above once more. From 0.2.5 on, Aegis checks for updates at startup, verifies the release checksum and restarts into the new version. Network failures do not block the current version. Use `--no-auto-update` to skip, or set `autoUpdate: false` in configuration.
 
 ## Privacy and scope
 
