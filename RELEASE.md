@@ -1,11 +1,13 @@
-Initial Aegis release: read-only terminal security checks, evidence-based local HTML reports, Chinese / English / Indonesian UI, and optional sanitized DeepSeek analysis through the official Anthropic SDK.
+Aegis 0.1.3
 
-Download the binary for your OS, or use the one-command installer in the README. SHA256SUMS contains release hashes.
+- Run `aegis`, enter the access password, and scanning, sanitized DeepSeek analysis and local reporting proceed automatically. No action menus or repeated confirmations.
+- Automatic startup updates, with download progress.
+- Installer shows a download progress bar and configures the command path. Installation never launches a scan.
+- Removed the ASCII shield; retained gradient AEGIS lettering.
+- macOS 15+ Apple Silicon / Intel and Windows x64. Chinese, English and Indonesian.
 
-This release is an initial implementation with explicit coverage limitations. It does not guarantee absence of threats or recover deleted evidence. macOS binaries are ad-hoc signed, not Apple-notarized; Windows binaries are unsigned.
+Raw evidence stays local. Use `--local` to skip DeepSeek. Source remains private; this repository distributes binaries and installers only.
 
-Source code remains private. No source or source maps are distributed by this repository.
+Validation: type checking and 21 tests passed. macOS ARM64 and Intel executable startup checked locally. The previous 0.1.2 build passed macOS 15 ARM64, macOS 15 Intel and Windows x64 CI; these 0.1.3 binaries are cross-compiled locally.
 
-Validation for this initial build: local type checking and 21 tests passed; DeepSeek SDK connectivity passed with synthetic input. macOS ARM64 and Intel binaries passed local startup smoke tests (Intel via Rosetta). Windows binary is cross-compiled and has not yet been runtime-tested. macOS 15-specific and Windows CI validation is pending because the organization Actions billing/spending limit prevented jobs from starting.
-
-Includes startup self-update, device/OS metadata, top-right theme switch, and inline risk evidence with a compact report layout.
+macOS binaries are ad-hoc signed, not Apple-notarized; Windows binaries are unsigned. SHA256SUMS contains release hashes.

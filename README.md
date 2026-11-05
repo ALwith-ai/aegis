@@ -20,7 +20,7 @@ Windows x64 (PowerShell):
 irm https://raw.githubusercontent.com/alwith-ai/aegis/main/install.ps1 | iex
 ```
 
-Run `~/.local/bin/aegis` on macOS, or `aegis` on Windows. An access password is required; obtain it from your administrator.
+After installation, run `aegis`. Installation does not launch the scanner. An access password is required; obtain it from your administrator.
 
 ```sh
 aegis --lang zh
@@ -31,13 +31,13 @@ aegis --update
 aegis --no-auto-update
 ```
 
-If `aegis` is not on your Mac PATH, use the full path printed by the installer. The installer does not change your shell files.
+The installer configures the command automatically. If the installer asks you to reopen your terminal, do so once, then run `aegis`.
 
 Aegis checks for updates at startup, verifies the release checksum and restarts into the new version. Network failures do not block the current version. Use `--no-auto-update` to skip, or set `autoUpdate: false` in configuration.
 
 ## Privacy and scope
 
-Raw processes, history, logs and file content remain local. Before optional DeepSeek analysis, Aegis asks permission and allows preview of the exact sanitized payload. Only local rule IDs, risk levels, evidence references, timestamps, opaque target IDs and signature status are sent. No raw command lines, usernames, hostnames, IPs, filenames, history, logs or keys are included. Analysis uses the Anthropic SDK directly against DeepSeek, without local AI CLIs.
+Raw processes, history, logs and file content remain local. After password authentication, scanning, local reporting and sanitized DeepSeek analysis run automatically. Use `--local` for offline analysis. The exact sanitized payload is saved alongside the report. Only local rule IDs, risk levels, evidence references, timestamps, opaque target IDs and signature status are sent. No raw command lines, usernames, hostnames, IPs, filenames, history, logs or keys are included. Analysis uses the Anthropic SDK directly against DeepSeek, without local AI CLIs.
 
 Reports include `终端安全排查报告.html`, `evidence.json`, checksums and, when sent, `ai-payload.json`. Treat local reports as sensitive.
 
