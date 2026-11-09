@@ -1,0 +1,26 @@
+{
+  "name": "aegis",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "aegis-dev": "dev.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "check": "tsc --noEmit",
+    "build": "bun scripts/build.ts",
+    "checksums": "bun scripts/checksums.ts",
+    "dev": "bun dev.ts",
+    "dev:watch": "bun --watch dev.ts",
+    "debug": "bun --inspect dev.ts"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.8.1",
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
+  }
+}

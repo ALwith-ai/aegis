@@ -1,0 +1,90 @@
+name: aegis release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (must match package.json)
+        required: true
+permissions:
+  contents: read
+concurrency: release-${{ inputs.tag || github.ref_name }}
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: bun-darwin-arm64
+            executable: aegis-darwin-arm64
+          - os: macos-15-intel
+            target: bun-darwin-x64
+            executable: aegis-darwin-x64
+          - os: windows-latest
+            target: bun-windows-x64-baseline
+            executable: aegis-windows-x64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun test
+      - name: Build without credentials
+        run: bun scripts/build.ts ${{ matrix.target }}
+      - name: Sign macOS binary locally
+        if: runner.os == 'macOS'
+        run: codesign --sign - --force dist/${{ matrix.executable }}
+      - name: Binary smoke test
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          ./dist/${{ matrix.executable }} --help
+          test "$(./dist/${{ matrix.executable }} --version)" = "${TAG#v}"
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            python3 scripts/test-install.py
+          fi
+      - name: Windows installation and credential test
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-install.ps1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.executable }}
+          path: dist/${{ matrix.executable }}
+          retention-days: 7
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums and version
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          printf '%s\n' "$TAG" > dist/VERSION
+          cd dist && sha256sum aegis-* VERSION > SHA256SUMS
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$TAG" dist/aegis-darwin-arm64 dist/aegis-darwin-x64 dist/aegis-windows-x64.exe dist/SHA256SUMS dist/VERSION \
+            --repo "$GITHUB_REPOSITORY" --title "aegis $TAG" --notes-file RELEASE.md --latest

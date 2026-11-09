@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+aegis-reports/
+*.log
+.DS_Store
+
+*.bun-build
+
+credentials.json
+*.bundle

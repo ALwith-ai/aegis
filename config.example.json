@@ -1,0 +1,7 @@
+{
+  "language": "zh",
+  "baseUrl": "https://api.deepseek.com/anthropic",
+  "model": "deepseek-flash",
+  "releaseRepo": "alwith-ai/aegis",
+  "autoUpdate": true
+}
