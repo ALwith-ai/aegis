@@ -1,7 +1,12 @@
 $ErrorActionPreference = 'Stop'
 function Get-AegisDownload([string]$Uri, [string]$Destination) {
-    & curl.exe --fail --location --progress-bar --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 $Uri --output $Destination
-    if ($LASTEXITCODE -ne 0) { throw 'Download failed after retries' }
+    for ($attempt = 1; $attempt -le 4; $attempt++) {
+        $requestUri = if ($attempt -eq 1) { $Uri } else { $Uri + '?aegis_retry=' + [Guid]::NewGuid().ToString('N') }
+        & curl.exe --fail --location --progress-bar --connect-timeout 15 --max-time 900 $requestUri --output $Destination
+        if ($LASTEXITCODE -eq 0) { return }
+        if ($attempt -lt 4) { Start-Sleep -Seconds $attempt }
+    }
+    throw 'Download failed after retries'
 }
 if ([Environment]::Is64BitOperatingSystem -eq $false -or $env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { throw 'Windows x64 required' }
 $repo = 'ALwith-ai/aegis'
