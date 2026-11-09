@@ -1,0 +1,37 @@
+name: Verify public installation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Install the public macOS release
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          AEGIS_TOKEN: fixture_public_install_token_0123456789
+          AEGIS_INSTALL_DIR: /tmp/aegis-public-bin
+        run: |
+          curl --retry 3 -fsSL https://raw.githubusercontent.com/ALwith-ai/aegis/main/install.sh | sh
+          /tmp/aegis-public-bin/aegis --version
+          env -u AEGIS_TOKEN /tmp/aegis-public-bin/aegis --check-config
+      - name: Install the public Windows release
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          AEGIS_TOKEN: fixture_public_install_token_0123456789
+        run: |
+          irm https://raw.githubusercontent.com/ALwith-ai/aegis/main/install.ps1 | iex
+          Remove-Item Env:AEGIS_TOKEN
+          aegis --version
+          aegis --check-config
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
