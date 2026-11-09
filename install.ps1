@@ -1,4 +1,8 @@
 $ErrorActionPreference = 'Stop'
+function Get-AegisDownload([string]$Uri, [string]$Destination) {
+    & curl.exe --fail --location --progress-bar --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 $Uri --output $Destination
+    if ($LASTEXITCODE -ne 0) { throw 'Download failed after retries' }
+}
 if ([Environment]::Is64BitOperatingSystem -eq $false -or $env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { throw 'Windows x64 required' }
 $repo = 'ALwith-ai/aegis'
 $credentialsDir = Join-Path $env:USERPROFILE '.config\aegis'
@@ -10,13 +14,13 @@ $asset = 'aegis-windows-x64.exe'
 $stage = Join-Path ([IO.Path]::GetTempPath()) ('aegis-' + [Guid]::NewGuid())
 New-Item -ItemType Directory -Path $stage | Out-Null
 try {
-    $tag = (Invoke-RestMethod "https://github.com/$repo/releases/latest/download/VERSION").Trim()
+    Get-AegisDownload "https://github.com/$repo/releases/latest/download/VERSION" (Join-Path $stage 'VERSION')
+    $tag = (Get-Content -Raw (Join-Path $stage 'VERSION')).Trim()
     if ($tag -notmatch '^v\d+\.\d+\.\d+$') { throw 'Invalid release' }
     $base = "https://github.com/$repo/releases/download/$tag"
     $file = Join-Path $stage $asset
-    & curl.exe --fail --location --progress-bar "$base/$asset" --output $file
-    if ($LASTEXITCODE -ne 0) { throw 'Download failed' }
-    Invoke-WebRequest "$base/SHA256SUMS" -OutFile (Join-Path $stage 'SHA256SUMS')
+    Get-AegisDownload "$base/$asset" $file
+    Get-AegisDownload "$base/SHA256SUMS" (Join-Path $stage 'SHA256SUMS')
     $line = Get-Content (Join-Path $stage 'SHA256SUMS') | Where-Object { $_ -match "\s+$([regex]::Escape($asset))$" }
     if (-not $line) { throw 'Checksum absent' }
     $expected = ($line -split '\s+')[0]
@@ -28,9 +32,8 @@ try {
         $runtimeAsset = "dsh-runtime-$runtimeVersion-windows-x64.tar.gz"
         $runtimeBase = "https://github.com/$repo/releases/download/dsh-runtime-$runtimeVersion"
         $runtimeFile = Join-Path $stage $runtimeAsset
-        & curl.exe --fail --location --progress-bar "$runtimeBase/$runtimeAsset" --output $runtimeFile
-        if ($LASTEXITCODE -ne 0) { throw 'Runtime download failed' }
-        Invoke-WebRequest "$runtimeBase/SHA256SUMS" -OutFile (Join-Path $stage 'RUNTIME_SHA256SUMS')
+        Get-AegisDownload "$runtimeBase/$runtimeAsset" $runtimeFile
+        Get-AegisDownload "$runtimeBase/SHA256SUMS" (Join-Path $stage 'RUNTIME_SHA256SUMS')
         $runtimeLine = Get-Content (Join-Path $stage 'RUNTIME_SHA256SUMS') | Where-Object { $_ -match "\s+$([regex]::Escape($runtimeAsset))$" }
         if (-not $runtimeLine) { throw 'Runtime checksum absent' }
         if ((Get-FileHash $runtimeFile -Algorithm SHA256).Hash.ToLower() -ne (($runtimeLine -split '\s+')[0]).ToLower()) { throw 'Runtime checksum mismatch' }

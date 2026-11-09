@@ -16,12 +16,12 @@ case "$(uname -m)" in arm64) arch=arm64;; x86_64) arch=x64;; *) echo 'Unsupporte
 asset="aegis-darwin-$arch"
 stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT HUP INT TERM
-curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/$repo/releases/latest/download/VERSION" -o "$stage/VERSION"
+curl --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 --proto '=https' --tlsv1.2 -fsSL "https://github.com/$repo/releases/latest/download/VERSION" -o "$stage/VERSION"
 tag=$(tr -d '\r\n' < "$stage/VERSION")
 case "$tag" in v[0-9]*.[0-9]*.[0-9]*) ;; *) echo 'Invalid release' >&2; exit 1;; esac
 base="https://github.com/$repo/releases/download/$tag"
-curl --proto '=https' --tlsv1.2 -fSL --progress-bar "$base/$asset" -o "$stage/$asset"
-curl --proto '=https' --tlsv1.2 -fsSL "$base/SHA256SUMS" -o "$stage/SHA256SUMS"
+curl --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 --proto '=https' --tlsv1.2 -fSL --progress-bar "$base/$asset" -o "$stage/$asset"
+curl --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 --proto '=https' --tlsv1.2 -fsSL "$base/SHA256SUMS" -o "$stage/SHA256SUMS"
 expected=$(awk -v name="$asset" '$2 == name {print $1}' "$stage/SHA256SUMS")
 actual=$(shasum -a 256 "$stage/$asset" | awk '{print $1}')
 [ -n "$expected" ] && [ "$actual" = "$expected" ] || { echo 'Checksum mismatch' >&2; exit 1; }
@@ -31,8 +31,8 @@ runtime_dir="$HOME/.aegis/dsh/$runtime_version"
 if [ ! -f "$runtime_dir/.complete" ]; then
   runtime_asset="dsh-runtime-$runtime_version-darwin-$arch.tar.gz"
   runtime_base="https://github.com/$repo/releases/download/dsh-runtime-$runtime_version"
-  curl --proto '=https' --tlsv1.2 -fSL --progress-bar "$runtime_base/$runtime_asset" -o "$stage/$runtime_asset"
-  curl --proto '=https' --tlsv1.2 -fsSL "$runtime_base/SHA256SUMS" -o "$stage/RUNTIME_SHA256SUMS"
+  curl --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 --proto '=https' --tlsv1.2 -fSL --progress-bar "$runtime_base/$runtime_asset" -o "$stage/$runtime_asset"
+  curl --retry 4 --retry-all-errors --retry-delay 1 --retry-max-time 300 --connect-timeout 15 --max-time 900 --proto '=https' --tlsv1.2 -fsSL "$runtime_base/SHA256SUMS" -o "$stage/RUNTIME_SHA256SUMS"
   expected=$(awk -v name="$runtime_asset" '$2 == name {print $1}' "$stage/RUNTIME_SHA256SUMS")
   actual=$(shasum -a 256 "$stage/$runtime_asset" | awk '{print $1}')
   [ -n "$expected" ] && [ "$actual" = "$expected" ] || { echo 'Runtime checksum mismatch' >&2; exit 1; }

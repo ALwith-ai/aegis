@@ -12,9 +12,16 @@ try {
     New-Item -ItemType Directory -Force -Path $runtime | Out-Null
     Set-Content (Join-Path $runtime '.complete') '0.2.1rc2'
     $version = (Get-Content (Join-Path $root 'package.json') | ConvertFrom-Json).version
-    function Invoke-RestMethod { param($Uri) return "v$version" }
-    function curl.exe { $index = [Array]::IndexOf($args, '--output'); Copy-Item (Join-Path $root 'dist\aegis-windows-x64.exe') $args[$index + 1]; $global:LASTEXITCODE = 0 }
-    function Invoke-WebRequest { param($Uri, $OutFile) $hash = (Get-FileHash (Join-Path $root 'dist\aegis-windows-x64.exe') -Algorithm SHA256).Hash.ToLower(); [IO.File]::WriteAllText($OutFile, "$hash  aegis-windows-x64.exe`n") }
+    function curl.exe {
+        $index = [Array]::IndexOf($args, '--output'); $destination = $args[$index + 1]
+        $uri = $args | Where-Object { $_ -like 'https:*' } | Select-Object -First 1
+        if ($uri -like '*/VERSION') { [IO.File]::WriteAllText($destination, "v$version") }
+        elseif ($uri -like '*/SHA256SUMS') {
+            $hash = (Get-FileHash (Join-Path $root 'dist\aegis-windows-x64.exe') -Algorithm SHA256).Hash.ToLower()
+            [IO.File]::WriteAllText($destination, "$hash  aegis-windows-x64.exe`n")
+        } else { Copy-Item (Join-Path $root 'dist\aegis-windows-x64.exe') $destination }
+        $global:LASTEXITCODE = 0
+    }
     & (Join-Path $root 'install.ps1')
     Remove-Item Env:AEGIS_TOKEN
     $credential = Join-Path $env:USERPROFILE '.config\aegis\credentials.json'
