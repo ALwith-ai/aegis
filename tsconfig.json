@@ -1,20 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "preserve",
-    "moduleResolution": "bundler",
-    "types": [
-      "bun"
-    ],
-    "strict": true,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": true
-  },
-  "include": [
-    "main.ts",
-    "src/**/*.ts",
-    "tests/**/*.ts",
-    "dev.ts"
-  ]
+  "extends": "@nyssance/tsconfig/bun.json",
+  "include": ["main.ts", "src/**/*.ts", "tests/**/*.ts", "dev.ts"]
 }
