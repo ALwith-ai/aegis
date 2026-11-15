@@ -9,7 +9,7 @@
         "commander": "^15.1.0",
       },
       "devDependencies": {
-        "@nyssance/tsconfig": "^0.1.0",
+        "@nyssance/tsconfig": "^0.1.2",
         "@types/bun": "^1.4.4",
       },
     },
@@ -19,7 +19,7 @@
 
     "@clack/prompts": ["@clack/prompts@1.9.0", "", { "dependencies": { "@clack/core": "1.6.0", "fast-string-width": "^3.0.2", "fast-wrap-ansi": "^0.2.0", "sisteransi": "^2.0.0" } }, "sha512-tEj8X2No2A1c9NDnZECxiiJ8TP3vmFlN9tLlLeSaMqVW4tUmVG2R4qpv/eP4zymWxnymYLkLcIYVV0VcWj3RCQ=="],
 
-    "@nyssance/tsconfig": ["@nyssance/tsconfig@0.1.0", "", {}, "sha512-tLXTdPG1MehZI0kc3ZA37KYLp9az9ktUI/SKMjO+DHdqlgzsY2yHcSIG0yE8c2nfjqD0bb8ulOLqJkun1IKxTQ=="],
+    "@nyssance/tsconfig": ["@nyssance/tsconfig@0.1.2", "", {}, "sha512-BQ0PzHmJEQJQ0oQ+2sVEAsxzz5LEcq3kPKVcXMg1JJxt219C24wQab6z9FuC/JJzyM6XIQQpYLNU3UhvNL3hfA=="],
 
     "@types/bun": ["@types/bun@1.4.4", "", { "dependencies": { "bun-types": "1.4.4" } }, "sha512-9wkRDXUXK124pEnAutE6n/l18j+i9GC5IAHK8TmX/2nlySETmky0OU6yL5U8pW1AoKh++AN9auDCr647BfurjQ=="],
 
