@@ -33,10 +33,10 @@ jobs:
           persist-credentials: false
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.4
+          bun-version: canary
       - run: bun install --frozen-lockfile
       - run: bun check
-      - run: bun test
+      - run: bun run test
       - name: Build without credentials
         run: bun scripts/build.ts ${{ matrix.target }}
       - name: Sign macOS binary locally

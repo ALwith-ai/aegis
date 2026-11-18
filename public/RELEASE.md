@@ -1,3 +1,7 @@
+aegis v0.3.1
+
+- Build the macOS and Windows executables ahead of time with Bun to reduce download size.
+
 aegis v0.3.0
 
 - One public repository for source, CI and downloads; no cross-repository release credentials.
