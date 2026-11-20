@@ -1,3 +1,7 @@
+aegis v0.3.2
+
+- Remove the parts of the Bun runtime the program never calls, and forbid generating code from strings at run time. The macOS ARM64 executable goes from 60 MB to 41 MB.
+
 aegis v0.3.1
 
 - Build the macOS and Windows executables ahead of time with Bun to reduce download size.
