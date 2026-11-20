@@ -18,8 +18,8 @@ describe("dsh runtime assets", () => {
     expect(runtimeAssets[platformKey("win32", "x64")].files[0]).toBe(".exe")
   })
   test("installers pin the same runtime version and asset names", async () => {
-    const sh = await readFile(new URL("../scripts/install.sh", import.meta.url), "utf8")
-    const ps = await readFile(new URL("../scripts/install.ps1", import.meta.url), "utf8")
+    const sh = await readFile(new URL("../install.sh", import.meta.url), "utf8")
+    const ps = await readFile(new URL("../install.ps1", import.meta.url), "utf8")
     expect(sh).toContain(`runtime_version=${runtimeVersion}`)
     expect(sh).toContain('"$HOME/.aegis/dsh/$runtime_version"')
     expect(sh).toContain('dsh-runtime-$runtime_version-darwin-$arch.tar.gz')
