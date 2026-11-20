@@ -1,3 +1,8 @@
+aegis v0.3.3
+
+- Releases carry the executables gzip-compressed, which the installers and the updater unpack with what the system already has. The macOS ARM64 download goes from 41 MB to about 19 MB.
+- Versions up to 0.3.2 look for the uncompressed file and cannot update themselves to this release. Run the one-line installation command once; the saved credential is kept.
+
 aegis v0.3.2
 
 - Remove the parts of the Bun runtime the program never calls, and forbid generating code from strings at run time. The macOS ARM64 executable goes from 60 MB to 41 MB.

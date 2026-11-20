@@ -23,13 +23,19 @@ try {
     $tag = (Get-Content -Raw (Join-Path $stage 'VERSION')).Trim()
     if ($tag -notmatch '^v\d+\.\d+\.\d+$') { throw 'Invalid release' }
     $base = "https://github.com/$repo/releases/download/$tag"
+    # The release carries the executable gzip-compressed; the checksum is of the file as downloaded.
     $file = Join-Path $stage $asset
-    Get-AegisDownload "$base/$asset" $file
+    $archive = "$file.gz"
+    Get-AegisDownload "$base/$asset.gz" $archive
     Get-AegisDownload "$base/SHA256SUMS" (Join-Path $stage 'SHA256SUMS')
-    $line = Get-Content (Join-Path $stage 'SHA256SUMS') | Where-Object { $_ -match "\s+$([regex]::Escape($asset))$" }
+    $line = Get-Content (Join-Path $stage 'SHA256SUMS') | Where-Object { $_ -match "\s+$([regex]::Escape("$asset.gz"))$" }
     if (-not $line) { throw 'Checksum absent' }
     $expected = ($line -split '\s+')[0]
-    if ((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -ne $expected.ToLower()) { throw 'Checksum mismatch' }
+    if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLower() -ne $expected.ToLower()) { throw 'Checksum mismatch' }
+    $compressed = [IO.File]::OpenRead($archive)
+    $executable = [IO.File]::Create($file)
+    try { [IO.Compression.GZipStream]::new($compressed, [IO.Compression.CompressionMode]::Decompress).CopyTo($executable) }
+    finally { $executable.Close(); $compressed.Close() }
     # DeepSeek Harness runtime (the investigation engine): pinned release tag, SHA256SUMS, tar.exe extraction.
     $runtimeVersion = '0.2.1rc2'
     $runtimeDir = Join-Path $env:USERPROFILE ".aegis\dsh\$runtimeVersion"

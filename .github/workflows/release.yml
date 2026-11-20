@@ -80,11 +80,11 @@ jobs:
           TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           printf '%s\n' "$TAG" > dist/VERSION
-          cd dist && sha256sum aegis-* VERSION > SHA256SUMS
+          cd dist && gzip -9 aegis-darwin-arm64 aegis-darwin-x64 aegis-windows-x64.exe && sha256sum aegis-*.gz VERSION > SHA256SUMS
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          gh release create "$TAG" dist/aegis-darwin-arm64 dist/aegis-darwin-x64 dist/aegis-windows-x64.exe dist/SHA256SUMS dist/VERSION \
+          gh release create "$TAG" dist/aegis-darwin-arm64.gz dist/aegis-darwin-x64.gz dist/aegis-windows-x64.exe.gz dist/SHA256SUMS dist/VERSION \
             --repo "$GITHUB_REPOSITORY" --title "aegis $TAG" --notes-file RELEASE.md --latest

@@ -12,14 +12,20 @@ try {
     New-Item -ItemType Directory -Force -Path $runtime | Out-Null
     Set-Content (Join-Path $runtime '.complete') '0.2.1rc2'
     $version = (Get-Content (Join-Path $root 'package.json') | ConvertFrom-Json).version
+    # Not $archive: the installer has a variable of that name, and the stub below runs in its scope.
+    $fixtureArchive = Join-Path $temp 'aegis-windows-x64.exe.gz'
+    $source = [IO.File]::OpenRead((Join-Path $root 'dist\aegis-windows-x64.exe'))
+    $target = [IO.File]::Create($fixtureArchive)
+    $gzip = [IO.Compression.GZipStream]::new($target, [IO.Compression.CompressionLevel]::Optimal)
+    try { $source.CopyTo($gzip) } finally { $gzip.Close(); $target.Close(); $source.Close() }
     function curl.exe {
         $index = [Array]::IndexOf($args, '--output'); $destination = $args[$index + 1]
         $uri = $args | Where-Object { $_ -like 'https:*' } | Select-Object -First 1
         if ($uri -like '*/VERSION') { [IO.File]::WriteAllText($destination, "v$version") }
         elseif ($uri -like '*/SHA256SUMS') {
-            $hash = (Get-FileHash (Join-Path $root 'dist\aegis-windows-x64.exe') -Algorithm SHA256).Hash.ToLower()
-            [IO.File]::WriteAllText($destination, "$hash  aegis-windows-x64.exe`n")
-        } else { Copy-Item (Join-Path $root 'dist\aegis-windows-x64.exe') $destination }
+            $hash = (Get-FileHash $fixtureArchive -Algorithm SHA256).Hash.ToLower()
+            [IO.File]::WriteAllText($destination, "$hash  aegis-windows-x64.exe.gz`n")
+        } else { Copy-Item $fixtureArchive $destination }
         $global:LASTEXITCODE = 0
     }
     & (Join-Path $root 'install.ps1')

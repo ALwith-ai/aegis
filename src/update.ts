@@ -21,7 +21,8 @@ export async function update(repo: string, checkTimeout = 20000, onProgress?: (r
   const latest = tag.slice(1)
   if (Bun.semver.order(latest, pkg.version) <= 0) return { status: "current", message: `${pkg.version}: up to date` }
   if (!isCompiled()) return { status: "source", message: `Source run: ${pkg.version} → ${latest}; rebuild to update` }
-  const asset = assetName(), base = `https://github.com/${repo}/releases/download/${tag}`
+  // Releases carry the executable gzip-compressed; the checksum is of the file as downloaded.
+  const asset = `${assetName()}.gz`, base = `https://github.com/${repo}/releases/download/${tag}`
   // Read the small checksum file to completion inside its own timeout; its body must not wait behind the large download.
   const [file, sums] = await Promise.all([
     fetch(`${base}/${asset}`, { signal: AbortSignal.timeout(900000) }),
@@ -44,7 +45,7 @@ export async function update(repo: string, checkTimeout = 20000, onProgress?: (r
   verifyChecksum(bytes, sums, asset)
   const exe = process.execPath, directory = await mkdtemp(join(dirname(exe), ".aegis-update-")), staged = join(directory, "aegis")
   try {
-    await writeFile(staged, bytes, { mode: 0o755, flag: "wx" }); await chmod(staged, 0o755)
+    await writeFile(staged, Bun.gunzipSync(bytes), { mode: 0o755, flag: "wx" }); await chmod(staged, 0o755)
     if (process.platform === "win32") {
       const backup = `${exe}.${Date.now()}.old`
       await rename(exe, backup)

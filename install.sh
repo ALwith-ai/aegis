@@ -34,11 +34,13 @@ download "https://github.com/$repo/releases/latest/download/VERSION" "$stage/VER
 tag=$(tr -d '\r\n' < "$stage/VERSION")
 case "$tag" in v[0-9]*.[0-9]*.[0-9]*) ;; *) echo 'Invalid release' >&2; exit 1;; esac
 base="https://github.com/$repo/releases/download/$tag"
-download "$base/$asset" "$stage/$asset"
+# The release carries the executable gzip-compressed; the checksum is of the file as downloaded.
+download "$base/$asset.gz" "$stage/$asset.gz"
 download "$base/SHA256SUMS" "$stage/SHA256SUMS"
-expected=$(awk -v name="$asset" '$2 == name {print $1}' "$stage/SHA256SUMS")
-actual=$(shasum -a 256 "$stage/$asset" | awk '{print $1}')
+expected=$(awk -v name="$asset.gz" '$2 == name {print $1}' "$stage/SHA256SUMS")
+actual=$(shasum -a 256 "$stage/$asset.gz" | awk '{print $1}')
 [ -n "$expected" ] && [ "$actual" = "$expected" ] || { echo 'Checksum mismatch' >&2; exit 1; }
+gunzip -f "$stage/$asset.gz"
 # DeepSeek Harness runtime (the investigation engine), same checks: pinned release tag, SHA256SUMS, then extract.
 runtime_version=0.2.1rc2
 runtime_dir="$HOME/.aegis/dsh/$runtime_version"
