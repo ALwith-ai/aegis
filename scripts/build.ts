@@ -8,7 +8,7 @@ if (!allowed.includes(requested as typeof allowed[number])) throw new Error("Uns
 const target = requested as typeof allowed[number]
 const name = target.replace("bun-", "aegis-").replace("-baseline", "") + (target.includes("windows") ? ".exe" : "")
 await mkdir("dist", { recursive: true })
-const build = Bun.spawnSync([process.execPath, "build", "--compile", "--aot", "--minify", `--target=${target}`, "./main.ts", "--outfile", join("dist", name)], { stdout: "inherit", stderr: "inherit" })
+const build = Bun.spawnSync([process.execPath, "build", "--compile", "--aot", "--trim", "--disallow-code-generation-from-strings", "--minify", `--target=${target}`, "./main.ts", "--outfile", join("dist", name)], { stdout: "inherit", stderr: "inherit" })
 if (build.exitCode !== 0) process.exit(build.exitCode)
 if (process.platform === "darwin" && target.startsWith("bun-darwin-")) {
   const metadata = Bun.spawnSync(["/usr/bin/otool", "-l", join("dist", name)])
