@@ -7,24 +7,24 @@ import { join } from "node:path";
 // DeepSeek Harness (dsh) one-shot runtime: DeepSeek's prebuilt native executable (deepseek-harness-runtime-bin on PyPI),
 // repacked per platform and attached to the `dsh-runtime-<version>` release of the download repository. The installer
 // places it under ~/.aegis/dsh/<version>; ensureRuntime only downloads when that step was skipped.
-export const runtimeVersion = "0.2.1rc2";
+export const runtimeVersion = "0.2.2rc2";
 type Asset = { name: string; sha256: string; prefix: string; files: string[] };
 export const runtimeAssets: Record<string, Asset> = {
   "darwin-arm64": {
     name: `dsh-runtime-${runtimeVersion}-darwin-arm64.tar.gz`,
-    sha256: "12f2fd9131360d94721c7efd60579446201e060a0242fe92608f8a4c5810640b",
+    sha256: "182bd84607cd6611c59ced5bcefdd1537fa49833e67b441e29b28a8a83e425d6",
     prefix: "deepseek-harness-sdk-runtime-macos-arm64",
     files: ["", "-rg", "-spawn-helper"],
   },
   "darwin-x64": {
     name: `dsh-runtime-${runtimeVersion}-darwin-x64.tar.gz`,
-    sha256: "85df4d16ef90fe60834ba191fdea04b5bff58329e7a51456951adfc23e88395b",
+    sha256: "ea2ff2de33c431cdb184813425b6d8d552ad440d2628652f25cc3332f117f167",
     prefix: "deepseek-harness-sdk-runtime-macos-x64",
     files: ["", "-rg", "-spawn-helper"],
   },
   "win32-x64": {
     name: `dsh-runtime-${runtimeVersion}-windows-x64.tar.gz`,
-    sha256: "d310717b3040f9b1f8de3ca40aa52e6be830a8759a1bbd73c98fdf5b2ef6d792",
+    sha256: "c69d5e4c764d25c34d7e3305daaf4a85b22dbdf7ded6adcdad3f2d64a2c17291",
     prefix: "deepseek-harness-sdk-runtime-win-x64",
     files: [".exe", "-rg.exe"],
   },
@@ -121,6 +121,8 @@ ${platform === "win32" ? "- id: session-persistence-jsonl\n  config:\n    compre
 - id: tool-subagent-fork
   disabled: true
 - id: tool-subagent-control
+  disabled: true
+- id: tool-agent-team
   disabled: true
 - id: tool-workflow
   disabled: true

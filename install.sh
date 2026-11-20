@@ -42,7 +42,7 @@ actual=$(shasum -a 256 "$stage/$asset.gz" | awk '{print $1}')
 [ -n "$expected" ] && [ "$actual" = "$expected" ] || { echo 'Checksum mismatch' >&2; exit 1; }
 gunzip -f "$stage/$asset.gz"
 # DeepSeek Harness runtime (the investigation engine), same checks: pinned release tag, SHA256SUMS, then extract.
-runtime_version=0.2.1rc2
+runtime_version=0.2.2rc2
 runtime_dir="$HOME/.aegis/dsh/$runtime_version"
 if [ ! -f "$runtime_dir/.complete" ]; then
   runtime_asset="dsh-runtime-$runtime_version-darwin-$arch.tar.gz"

@@ -8,9 +8,9 @@ try {
     $env:USERPROFILE = Join-Path $temp 'home'; $env:LOCALAPPDATA = Join-Path $temp 'local'
     $env:AEGIS_INSTALL_DIR = Join-Path $temp 'bin'
     $env:AEGIS_TOKEN = 'fixture_personal_token_0123456789'
-    $runtime = Join-Path $env:USERPROFILE '.aegis\dsh\0.2.1rc2'
+    $runtime = Join-Path $env:USERPROFILE '.aegis\dsh\0.2.2rc2'
     New-Item -ItemType Directory -Force -Path $runtime | Out-Null
-    Set-Content (Join-Path $runtime '.complete') '0.2.1rc2'
+    Set-Content (Join-Path $runtime '.complete') '0.2.2rc2'
     $version = (Get-Content (Join-Path $root 'package.json') | ConvertFrom-Json).version
     # Not $archive: the installer has a variable of that name, and the stub below runs in its scope.
     $fixtureArchive = Join-Path $temp 'aegis-windows-x64.exe.gz'

@@ -56,4 +56,4 @@ bun test
 
 Source, CI and Releases live in this repository. Push a `vX.Y.Z` tag matching `package.json` to build and test all three platforms, then publish with the repository's built-in GitHub token. No cross-repository token or API credential is required. Never commit `.env`, credentials, reports, runtime logs or binary build caches.
 
-The bundled runtime assets are pinned to `dsh-runtime-0.2.1rc2` and checksum-verified. The upstream runtime's licenses remain applicable. GitHub Actions additionally tests the installer and local credential configuration on macOS and Windows.
+The bundled runtime assets are pinned to `dsh-runtime-0.2.2rc2` and checksum-verified. The upstream runtime's licenses remain applicable. GitHub Actions additionally tests the installer and local credential configuration on macOS and Windows.

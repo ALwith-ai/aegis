@@ -37,7 +37,7 @@ try {
     try { [IO.Compression.GZipStream]::new($compressed, [IO.Compression.CompressionMode]::Decompress).CopyTo($executable) }
     finally { $executable.Close(); $compressed.Close() }
     # DeepSeek Harness runtime (the investigation engine): pinned release tag, SHA256SUMS, tar.exe extraction.
-    $runtimeVersion = '0.2.1rc2'
+    $runtimeVersion = '0.2.2rc2'
     $runtimeDir = Join-Path $env:USERPROFILE ".aegis\dsh\$runtimeVersion"
     if (-not (Test-Path (Join-Path $runtimeDir '.complete'))) {
         $runtimeAsset = "dsh-runtime-$runtimeVersion-windows-x64.tar.gz"

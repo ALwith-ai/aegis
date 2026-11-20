@@ -1,3 +1,8 @@
+aegis v0.3.4
+
+- The investigation engine moves from DeepSeek Harness 0.2.1rc2 to 0.2.2rc2. Its new team-delegation tool is switched off, as the other delegation tools are; an investigation stays one read-only agent.
+- `bun scripts/runtime.ts <version>` repacks the engine from the files DeepSeek publishes, verified against their checksums.
+
 aegis v0.3.3
 
 - Releases carry the executables gzip-compressed, which the installers and the updater unpack with what the system already has. The macOS ARM64 download goes from 41 MB to about 19 MB.

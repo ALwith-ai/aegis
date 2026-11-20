@@ -32,7 +32,7 @@ describe("dsh overlay patch", () => {
   test("is valid YAML that locks the agent to read-only tools and an empty persona", () => {
     const rows = Bun.YAML.parse(patchText("deepseek-flash")) as { id: string; disabled?: boolean; config?: Record<string, unknown> }[]
     const byId = Object.fromEntries(rows.map(row => [row.id, row]))
-    for (const id of ["tool-web", "tool-subagent", "tool-subagent-fork", "tool-subagent-control", "tool-workflow", "tool-goal", "tool-jobs", "tool-skill"]) expect(byId[id]?.disabled).toBe(true)
+    for (const id of ["tool-web", "tool-subagent", "tool-subagent-fork", "tool-subagent-control", "tool-agent-team", "tool-workflow", "tool-goal", "tool-jobs", "tool-skill"]) expect(byId[id]?.disabled).toBe(true)
     expect(byId["tool-fs"]?.config).toEqual({ read: true, readImage: false, write: false, edit: false, applyPatch: false })
     expect(byId["approval"]?.config).toEqual({ policy: "never" })
     expect((byId["permission"]?.config as { defaultPreset: string }).defaultPreset).toBe("read-only")
